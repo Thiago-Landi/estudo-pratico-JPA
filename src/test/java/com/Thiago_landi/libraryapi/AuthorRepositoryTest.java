@@ -18,6 +18,7 @@ public class AuthorRepositoryTest {
 	@Autowired
     AuthorRepository repository;
 
+	
     @Test
     public void salvarTest(){
         Author author = new Author();
@@ -31,7 +32,7 @@ public class AuthorRepositoryTest {
 
    @Test
     public void atualizarTest(){
-        var id = UUID.fromString("d2df2e0d-482f-468e-8947-272cd2825916");
+        var id = UUID.fromString("955fac97-6c64-4ce5-b5f1-3a082d903f21");
 
         Optional<Author> possivelAutor = repository.findById(id);
 
@@ -41,13 +42,14 @@ public class AuthorRepositoryTest {
             System.out.println("Dados do Autor:");
             System.out.println(autorEncontrado);
 
-            autorEncontrado.setNationality("francesa");
+            autorEncontrado.setName("Joao");
 
             repository.save(autorEncontrado);
 
         }
     }
 	
+   
    @Test
    public void listarTest(){
        List<Author> lista = repository.findAll();
@@ -65,5 +67,4 @@ public class AuthorRepositoryTest {
        var id = UUID.fromString("d2df2e0d-482f-468e-8947-272cd2825916");
        repository.deleteById(id);
    }
-   
 }

@@ -45,7 +45,7 @@ public class Book {
 	
 	@ManyToOne
 	@JoinColumn(name = "id_author", nullable = false)
-	private Author idAuthor;
+	private Author Author;
 	
 	public Book() {
 	}
