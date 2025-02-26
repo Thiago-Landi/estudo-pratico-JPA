@@ -16,11 +16,13 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "book")
 @Getter
 @Setter
+@ToString(exclude = "author")
 public class Book {
 
 	@Id
@@ -45,7 +47,7 @@ public class Book {
 	
 	@ManyToOne
 	@JoinColumn(name = "id_author", nullable = false)
-	private Author Author;
+	private Author author;
 	
 	public Book() {
 	}

@@ -10,13 +10,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.Thiago_landi.libraryapi.model.Author;
+import com.Thiago_landi.libraryapi.model.Book;
 import com.Thiago_landi.libraryapi.repository.AuthorRepository;
+import com.Thiago_landi.libraryapi.repository.BookRepository;
 
 @SpringBootTest
 public class AuthorRepositoryTest {
 
 	@Autowired
-    AuthorRepository repository;
+    AuthorRepository authorRepository;
+	
+	@Autowired
+	BookRepository bookRepository;
 
 	
     @Test
@@ -26,7 +31,7 @@ public class AuthorRepositoryTest {
         author.setNationality("Brasileira");
         author.setDateBirth(LocalDate.of(1951, 1, 31));
 
-        var autorSalvo = repository.save(author);
+        var autorSalvo = authorRepository.save(author);
         System.out.println("Autor Salvo: " + autorSalvo);
     }
 
@@ -34,7 +39,7 @@ public class AuthorRepositoryTest {
     public void atualizarTest(){
         var id = UUID.fromString("955fac97-6c64-4ce5-b5f1-3a082d903f21");
 
-        Optional<Author> possivelAutor = repository.findById(id);
+        Optional<Author> possivelAutor = authorRepository.findById(id);
 
         if(possivelAutor.isPresent()){
 
@@ -44,7 +49,7 @@ public class AuthorRepositoryTest {
 
             autorEncontrado.setName("Joao");
 
-            repository.save(autorEncontrado);
+            authorRepository.save(autorEncontrado);
 
         }
     }
@@ -52,19 +57,31 @@ public class AuthorRepositoryTest {
    
    @Test
    public void listarTest(){
-       List<Author> lista = repository.findAll();
+       List<Author> lista = authorRepository.findAll();
        lista.forEach(System.out::println);
    }
    
    @Test
    public void countTest(){
-       System.out.println("Contagem de autores: " + repository.count());
+       System.out.println("Contagem de autores: " + authorRepository.count());
    }
    
    
    @Test
    public void deletePorIdTest(){
        var id = UUID.fromString("d2df2e0d-482f-468e-8947-272cd2825916");
-       repository.deleteById(id);
+       authorRepository.deleteById(id);
    }
+	
+	@Test
+	void bookFindByAuthor() {
+		var id = UUID.fromString("955fac97-6c64-4ce5-b5f1-3a082d903f21");
+		Author author = authorRepository.findById(id).orElse(null);
+		
+		List<Book> books = bookRepository.findByAuthor(author);
+		author.setBooks(books);
+		
+		author.getBooks().forEach(System.out::println);
+	}
+	
 }
