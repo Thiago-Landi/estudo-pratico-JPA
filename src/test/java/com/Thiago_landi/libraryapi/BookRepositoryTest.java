@@ -29,10 +29,10 @@ public class BookRepositoryTest {
 	void save() {
 		Book book = new Book();
 		
-		book.setIsbn("4563-1234");
+		book.setIsbn("0973-7930");
         book.setPrice(BigDecimal.valueOf(300));
-        book.setGender(GenderBook.MYSTERY);
-        book.setTitle("MIsterio da cabana");
+        book.setGender(GenderBook.SCIENCE);
+        book.setTitle("Ciencias");
         book.setDatePublication(LocalDate.of(1990, 3, 2));
         
         Author author = authorRepository.findById(UUID.fromString("ebd79aa6-6b91-49cb-8627-0df4b8de1eaf"))
@@ -80,6 +80,35 @@ public class BookRepositoryTest {
 		List<Book> books = bookRepository.findByTitleAndPrice("MIsterio da cabana", price);
 		books.forEach(System.out::println);
 	}
+	
+	@Test
+	void listBooksSortedByTitleAndPrice() {
+		List<Book> books = bookRepository.listBooksSortedByTitleAndPrice();
+		books.forEach(System.out::println);
+	}
+	
+	@Test
+	void findByGender() {
+		List<Book> books = bookRepository.findByGender(GenderBook.MYSTERY, "price");
+		books.forEach(System.out::println);
+	}
+	
+	@Test
+	void findByGenderPositionalParameters() {
+		List<Book> books = bookRepository.findByGeneroPositionalParameters(GenderBook.MYSTERY, "price");
+		books.forEach(System.out::println);
+	}
+	
+	@Test
+	void deleteByGender() {
+		bookRepository.deleteByGender(GenderBook.SCIENCE);
+	}
+	
+	@Test
+	void updateDatePublication() {
+		bookRepository.updateDatePublication(LocalDate.of(2000, 1, 1));
+	}
+	
 }
 
 	
