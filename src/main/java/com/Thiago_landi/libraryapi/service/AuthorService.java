@@ -43,4 +43,22 @@ public class AuthorService {
 		
 		return repository.findAll();
 	}
+	
+	public Author update(UUID id, Author author) {
+		try {
+			Author entity = repository.getReferenceById(id);
+			updateData(entity, author);
+			return repository.save(entity);
+		}catch (Exception e) {
+			  throw new IllegalArgumentException("Para atualizar, é necessário que o autor já esteja salvo na base.");
+		}
+		
+	}
+	
+	public void updateData(Author author, Author obj) {
+		author.setName(obj.getName());
+		author.setNationality(obj.getNationality());
+		author.setDateBirth(obj.getDateBirth());
+	}
+	
 }
