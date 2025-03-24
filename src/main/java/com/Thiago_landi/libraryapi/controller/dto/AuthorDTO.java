@@ -1,10 +1,11 @@
 package com.Thiago_landi.libraryapi.controller.dto;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 import com.Thiago_landi.libraryapi.model.Author;
 
-public record AuthorDTO(String name, LocalDate dateBirth, String nationality ) {
+public record AuthorDTO(UUID id ,String name, LocalDate dateBirth, String nationality ) {
 
 	
 	// serve para passar o AuthorDTO recebido no postman para a entidade Author
