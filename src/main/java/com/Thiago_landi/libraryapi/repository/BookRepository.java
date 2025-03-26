@@ -59,5 +59,5 @@ public interface BookRepository extends JpaRepository<Book, UUID>{
 	@Query(" update Book set datePublication =?1 ")
 	void updateDatePublication(LocalDate newDate);
     
-    
+    boolean existsByAuthor(Author author);
 	}

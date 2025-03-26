@@ -11,6 +11,7 @@ public record AuthorDTO(UUID id ,String name, LocalDate dateBirth, String nation
 	// serve para passar o AuthorDTO recebido no postman para a entidade Author
 	public Author mapForAuthor() {
 		Author author = new Author();
+		author.setId(id);
 		author.setName(this.name);
 		author.setDateBirth(this.dateBirth);
 		author.setNationality(this.nationality);

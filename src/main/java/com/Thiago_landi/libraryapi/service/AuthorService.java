@@ -7,51 +7,71 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.Thiago_landi.libraryapi.exceptions.InvalidOperationException;
 import com.Thiago_landi.libraryapi.model.Author;
 import com.Thiago_landi.libraryapi.repository.AuthorRepository;
+import com.Thiago_landi.libraryapi.repository.BookRepository;
+import com.Thiago_landi.libraryapi.validator.AuthorValidator;
 
 @Service
 public class AuthorService {
 
 	@Autowired
-	private AuthorRepository repository;
+	private AuthorRepository authorRepository;
+	
+	@Autowired
+	private AuthorValidator validator;
+	
+	@Autowired
+	private BookRepository bookRepository;
 	
 	public Author save(Author author) {
-		return repository.save(author);
+		validator.validate(author);
+		return authorRepository.save(author);
 	}
 	
 	public Optional<Author> findById(UUID id) {
-		return repository.findById(id);
+		return authorRepository.findById(id);
 	}
 	
 	public void delete(Author author) {
-		repository.delete(author);
+		if(existBook(author)) {
+			throw new InvalidOperationException(
+					"Não é permitido excluir um autor que possui livros cadastrados!");
+		}
+		
+		authorRepository.delete(author);
 	}
 	
 	public List<Author> search(String name, String nationality) {
 		if(name != null && nationality != null) {
-			return repository.findByNameAndNationality(name, nationality);
+			return authorRepository.findByNameAndNationality(name, nationality);
 		}
 		
 		if(name != null) {
-			return repository.findByName(name);
+			return authorRepository.findByName(name);
 		}
 		
 		if(nationality != null) {
-			return repository.findByNationality(nationality);
+			return authorRepository.findByNationality(nationality);
 		}
 		
-		return repository.findAll();
+		return authorRepository.findAll();
 	}
 	
 	public Author update(UUID id, Author author) {
-		try {
-			Author entity = repository.getReferenceById(id);
+		
+			Optional<Author> optionalAuthor = authorRepository.findById(id);
+			 if (optionalAuthor.isEmpty()) {
+			        throw new IllegalArgumentException("O autor com o ID fornecido não existe no banco.");
+			    }
+		
+			Author entity = optionalAuthor.get();
+
+		    validator.validate(author);
 			updateData(entity, author);
-			return repository.save(entity);
-		}catch (Exception e) {
-			  throw new IllegalArgumentException("Para atualizar, é necessário que o autor já esteja salvo na base.");
-		}
+			return authorRepository.save(entity);
+		
 		
 	}
 	
@@ -59,6 +79,10 @@ public class AuthorService {
 		author.setName(obj.getName());
 		author.setNationality(obj.getNationality());
 		author.setDateBirth(obj.getDateBirth());
+	}
+	
+	public boolean existBook(Author author) {
+		return bookRepository.existsByAuthor(author);
 	}
 	
 }
