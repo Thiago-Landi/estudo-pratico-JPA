@@ -26,6 +26,8 @@ import com.Thiago_landi.libraryapi.exceptions.RegistryDuplicateException;
 import com.Thiago_landi.libraryapi.model.Author;
 import com.Thiago_landi.libraryapi.service.AuthorService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/authors")
 public class AuthorController {
@@ -34,7 +36,7 @@ public class AuthorController {
 	private AuthorService service;
 	
 	@PostMapping
-	public ResponseEntity<Object> save(@RequestBody AuthorDTO author) {
+	public ResponseEntity<Object> save(@RequestBody @Valid AuthorDTO author) {
 		try {
 			Author authorModel = author.mapForAuthor();
 			service.save(authorModel);
@@ -94,7 +96,7 @@ public class AuthorController {
 			@RequestParam(value = "name", required = false) String name, // o required diz que não é obrigado a passar os paramentros, passando um ou o outro ou os 2 vai funcionar
 			@RequestParam(value = "nationality", required = false) String nationality) {
 		
-		List<Author> listAuthor = service.search(name, nationality);
+		List<Author> listAuthor = service.searchByExample(name, nationality);
 		List<AuthorDTO> dto = listAuthor.stream()
 				.map(author -> new AuthorDTO(author.getId(), author.getName(), author.getDateBirth(), author.getNationality()))
 				.collect(Collectors.toList());
@@ -104,7 +106,7 @@ public class AuthorController {
 	
 	@PutMapping("{id}")
 	public ResponseEntity<Object> update(
-			@PathVariable("id") String id, @RequestBody AuthorDTO dto){
+			@PathVariable("id") String id, @RequestBody @Valid AuthorDTO dto){
 		
 		try {
 			var idAuthor = UUID.fromString(id);

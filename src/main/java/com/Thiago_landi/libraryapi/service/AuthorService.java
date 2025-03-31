@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
 import com.Thiago_landi.libraryapi.exceptions.InvalidOperationException;
@@ -12,6 +14,8 @@ import com.Thiago_landi.libraryapi.model.Author;
 import com.Thiago_landi.libraryapi.repository.AuthorRepository;
 import com.Thiago_landi.libraryapi.repository.BookRepository;
 import com.Thiago_landi.libraryapi.validator.AuthorValidator;
+
+import jakarta.validation.ReportAsSingleViolation;
 
 @Service
 public class AuthorService {
@@ -57,6 +61,20 @@ public class AuthorService {
 		}
 		
 		return authorRepository.findAll();
+	}
+	
+	public List<Author> searchByExample(String name, String nationality){
+		var author = new Author();
+		author.setName(name);
+		author.setNationality(nationality);
+		
+		ExampleMatcher matcher = ExampleMatcher
+				.matching()
+				.withIgnoreNullValues()
+				.withIgnoreCase()
+				.withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+		Example<Author> authorExample = Example.of(author, matcher);
+		return authorRepository.findAll(authorExample);
 	}
 	
 	public Author update(UUID id, Author author) {
