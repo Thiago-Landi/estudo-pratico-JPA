@@ -15,8 +15,6 @@ import com.Thiago_landi.libraryapi.repository.AuthorRepository;
 import com.Thiago_landi.libraryapi.repository.BookRepository;
 import com.Thiago_landi.libraryapi.validator.AuthorValidator;
 
-import jakarta.validation.ReportAsSingleViolation;
-
 @Service
 public class AuthorService {
 
