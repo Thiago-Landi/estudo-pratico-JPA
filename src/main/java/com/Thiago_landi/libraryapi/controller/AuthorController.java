@@ -21,6 +21,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.Thiago_landi.libraryapi.controller.dto.AuthorDTO;
 import com.Thiago_landi.libraryapi.controller.dto.ErrorResponse;
+import com.Thiago_landi.libraryapi.controller.mappers.AuthorMapper;
 import com.Thiago_landi.libraryapi.exceptions.InvalidOperationException;
 import com.Thiago_landi.libraryapi.exceptions.RegistryDuplicateException;
 import com.Thiago_landi.libraryapi.model.Author;
@@ -35,10 +36,13 @@ public class AuthorController {
 	@Autowired
 	private AuthorService service;
 	
+	@Autowired
+	private AuthorMapper mapper;
+	
 	@PostMapping
-	public ResponseEntity<Object> save(@RequestBody @Valid AuthorDTO author) {
+	public ResponseEntity<Object> save(@RequestBody @Valid AuthorDTO dto) {
 		try {
-			Author authorModel = author.mapForAuthor();
+			Author authorModel = mapper.toEntity(dto);
 			service.save(authorModel);
 			
 			// esse codigo constroi a url para acessar o author criado (URL:http://localhost:8080/authors/{id}
@@ -58,17 +62,14 @@ public class AuthorController {
 	@GetMapping("{id}")
 	public ResponseEntity<AuthorDTO> findById(@PathVariable("id") String id) {
 		var idAuthor = UUID.fromString(id);
-		Optional<Author> authorOptional = service.findById(idAuthor);
-		if(authorOptional.isPresent()) {
-			Author author = authorOptional.get();
-			AuthorDTO dto = new AuthorDTO(
-					 author.getId(), author.getName(),
-					 author.getDateBirth(), author.getNationality());
-			
-			return ResponseEntity.ok(dto);
-		}
 		
-		return ResponseEntity.notFound().build();
+		return service
+					.findById(idAuthor)
+					.map(author -> { 
+						 AuthorDTO dto = mapper.toDTO(author);
+						 return ResponseEntity.ok(dto);
+					}).orElseGet( () -> ResponseEntity.notFound().build() );
+	
 	}
 	
 	@DeleteMapping("{id}")
@@ -98,7 +99,7 @@ public class AuthorController {
 		
 		List<Author> listAuthor = service.searchByExample(name, nationality);
 		List<AuthorDTO> dto = listAuthor.stream()
-				.map(author -> new AuthorDTO(author.getId(), author.getName(), author.getDateBirth(), author.getNationality()))
+				.map(mapper::toDTO)
 				.collect(Collectors.toList());
 		
 		return ResponseEntity.ok(dto);
@@ -116,8 +117,10 @@ public class AuthorController {
 				return ResponseEntity.notFound().build();
 			}
 			
-			Author authorPostman = dto.mapForAuthor();
-			authorPostman.setId(idAuthor);
+			Author authorPostman = optional.get();
+			authorPostman.setName(dto.name());
+			authorPostman.setNationality(dto.nationality());
+			authorPostman.setDateBirth(dto.dateBirth());
 			
 			service.update(idAuthor, authorPostman);
 			return ResponseEntity.noContent().build();
