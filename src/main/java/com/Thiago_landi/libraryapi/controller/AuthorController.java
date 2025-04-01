@@ -17,13 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.Thiago_landi.libraryapi.controller.dto.AuthorDTO;
-import com.Thiago_landi.libraryapi.controller.dto.ErrorResponse;
 import com.Thiago_landi.libraryapi.controller.mappers.AuthorMapper;
-import com.Thiago_landi.libraryapi.exceptions.InvalidOperationException;
-import com.Thiago_landi.libraryapi.exceptions.RegistryDuplicateException;
 import com.Thiago_landi.libraryapi.model.Author;
 import com.Thiago_landi.libraryapi.service.AuthorService;
 
@@ -31,7 +27,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/authors")
-public class AuthorController {
+public class AuthorController implements GenericController {
 
 	@Autowired
 	private AuthorService service;
@@ -41,22 +37,15 @@ public class AuthorController {
 	
 	@PostMapping
 	public ResponseEntity<Object> save(@RequestBody @Valid AuthorDTO dto) {
-		try {
-			Author authorModel = mapper.toEntity(dto);
-			service.save(authorModel);
+		
+		Author authorModel = mapper.toEntity(dto);
+		service.save(authorModel);
 			
-			// esse codigo constroi a url para acessar o author criado (URL:http://localhost:8080/authors/{id}
-			URI location = ServletUriComponentsBuilder
-	        .fromCurrentRequest()
-	        .path("/{id}")
-	        .buildAndExpand(authorModel.getId())
-	        .toUri();
+		// esse codigo constroi a url para acessar o author criado (URL:http://localhost:8080/authors/{id}
+		URI location = generateHeaderlocation(authorModel.getId());
 			
-			return ResponseEntity.created(location).build();
-		}catch(RegistryDuplicateException e) {
-			var errorDTO = ErrorResponse.conflict(e.getMessage());
-			return ResponseEntity.status(errorDTO.status()).body(errorDTO);
-		}
+		return ResponseEntity.created(location).build();
+		
 	}
 	
 	@GetMapping("{id}")
@@ -74,21 +63,18 @@ public class AuthorController {
 	
 	@DeleteMapping("{id}")
 	public ResponseEntity<Object> delete(@PathVariable("id") String id) {
-		try {
-			var idAuthor = UUID.fromString(id);
-			Optional<Author> author = service.findById(idAuthor);
+		
+		var idAuthor = UUID.fromString(id);
+		Optional<Author> author = service.findById(idAuthor);
 			
-			if(author.isEmpty()) {
+		if(author.isEmpty()) {
 				return ResponseEntity.notFound().build();
-			}
-			
-			service.delete(author.get());
-			return ResponseEntity.noContent().build();
-			
-		}catch(InvalidOperationException e) {
-			var errorResponse = ErrorResponse.responseDefault(e.getMessage());
-			return ResponseEntity.status(errorResponse.status()).body(errorResponse);
 		}
+			
+		service.delete(author.get());
+		return ResponseEntity.noContent().build();
+			
+		
 	}
 	
 	// esse codigo buscar de acordo ao nome ou a nacionalidade ou os 2
@@ -109,26 +95,23 @@ public class AuthorController {
 	public ResponseEntity<Object> update(
 			@PathVariable("id") String id, @RequestBody @Valid AuthorDTO dto){
 		
-		try {
-			var idAuthor = UUID.fromString(id);
+		
+		var idAuthor = UUID.fromString(id);
 			
-			Optional<Author> optional = service.findById(idAuthor);
-			if(optional.isEmpty()) {
-				return ResponseEntity.notFound().build();
-			}
-			
-			Author authorPostman = optional.get();
-			authorPostman.setName(dto.name());
-			authorPostman.setNationality(dto.nationality());
-			authorPostman.setDateBirth(dto.dateBirth());
-			
-			service.update(idAuthor, authorPostman);
-			return ResponseEntity.noContent().build();
-			
-		} catch(RegistryDuplicateException e) {
-			var errorDTO = ErrorResponse.conflict(e.getMessage());
-			return ResponseEntity.status(errorDTO.status()).body(errorDTO);
+		Optional<Author> optional = service.findById(idAuthor);
+		if(optional.isEmpty()) {
+			return ResponseEntity.notFound().build();
 		}
+			
+		Author authorPostman = optional.get();
+		authorPostman.setName(dto.name());
+		authorPostman.setNationality(dto.nationality());
+		authorPostman.setDateBirth(dto.dateBirth());
+			
+		service.update(idAuthor, authorPostman);
+		return ResponseEntity.noContent().build();
+			
+		
 	}
 }
 	
