@@ -15,7 +15,7 @@ import com.Thiago_landi.libraryapi.controller.dto.ErrorResponse;
 import com.Thiago_landi.libraryapi.exceptions.InvalidOperationException;
 import com.Thiago_landi.libraryapi.exceptions.RegistryDuplicateException;
 
-@RestControllerAdvice
+@RestControllerAdvice //Isso faz com que ela intercepte exceções lançadas dentro de qualquer controller
 public class GlobalExceptionHandler {
 
 	

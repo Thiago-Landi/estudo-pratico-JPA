@@ -9,6 +9,8 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
+import com.Thiago_landi.libraryapi.controller.dto.AuthorDTO;
+import com.Thiago_landi.libraryapi.controller.mappers.AuthorMapper;
 import com.Thiago_landi.libraryapi.exceptions.InvalidOperationException;
 import com.Thiago_landi.libraryapi.model.Author;
 import com.Thiago_landi.libraryapi.repository.AuthorRepository;
@@ -26,6 +28,9 @@ public class AuthorService {
 	
 	@Autowired
 	private BookRepository bookRepository;
+	
+	@Autowired
+	private AuthorMapper mapper;
 	
 	public Author save(Author author) {
 		validator.validate(author);
@@ -75,26 +80,22 @@ public class AuthorService {
 		return authorRepository.findAll(authorExample);
 	}
 	
-	public Author update(UUID id, Author author) {
+	public void update(UUID id, AuthorDTO author) {
 		
-			Optional<Author> optionalAuthor = authorRepository.findById(id);
-			 if (optionalAuthor.isEmpty()) {
-			        throw new IllegalArgumentException("O autor com o ID fornecido não existe no banco.");
-			    }
-		
-			Author entity = optionalAuthor.get();
+			Author entity = authorRepository.findById(id)
+					.orElseThrow( () -> new IllegalArgumentException("O autor com o ID fornecido não existe no banco."));
 
-		    validator.validate(author);
-			updateData(entity, author);
-			return authorRepository.save(entity);
-		
-		
+		  Author authorTemp = mapper.toEntity(author);
+			
+			validator.validate(authorTemp);
+			updateData(entity, author);		
+			authorRepository.save(entity);
 	}
 	
-	public void updateData(Author author, Author obj) {
-		author.setName(obj.getName());
-		author.setNationality(obj.getNationality());
-		author.setDateBirth(obj.getDateBirth());
+	private void updateData(Author author, AuthorDTO obj) {
+		author.setName(obj.name());
+		author.setNationality(obj.nationality());
+		author.setDateBirth(obj.dateBirth());
 	}
 	
 	public boolean existBook(Author author) {
