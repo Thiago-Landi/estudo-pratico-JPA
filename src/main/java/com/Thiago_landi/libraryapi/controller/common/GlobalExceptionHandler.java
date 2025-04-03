@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.Thiago_landi.libraryapi.controller.dto.ErrorField;
 import com.Thiago_landi.libraryapi.controller.dto.ErrorResponse;
+import com.Thiago_landi.libraryapi.exceptions.InvalidFieldException;
 import com.Thiago_landi.libraryapi.exceptions.InvalidOperationException;
 import com.Thiago_landi.libraryapi.exceptions.RegistryDuplicateException;
 
@@ -41,6 +42,15 @@ public class GlobalExceptionHandler {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ErrorResponse handlerInvalidOperationException(InvalidOperationException e) {
 		return ErrorResponse.responseDefault(e.getMessage());
+	}
+	
+	@ExceptionHandler(InvalidFieldException.class)
+	@ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+	public ErrorResponse handlerInvalidFieldException(InvalidFieldException e) {
+		return new ErrorResponse(
+				HttpStatus.UNPROCESSABLE_ENTITY.value(),
+				"Erro de validação", 
+				List.of(new ErrorField(e.getField(), e.getMessage())));
 	}
 	
 	@ExceptionHandler(RuntimeException.class)

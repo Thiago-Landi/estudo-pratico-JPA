@@ -15,11 +15,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.Thiago_landi.libraryapi.controller.dto.RegisterBookDTO;
+import com.Thiago_landi.libraryapi.controller.mappers.BookMapper;
 import com.Thiago_landi.libraryapi.model.Author;
 import com.Thiago_landi.libraryapi.model.Book;
 import com.Thiago_landi.libraryapi.model.GenderBook;
 import com.Thiago_landi.libraryapi.repository.AuthorRepository;
 import com.Thiago_landi.libraryapi.repository.BookRepository;
+import com.Thiago_landi.libraryapi.validator.BookValidator;
 
 @Service
 public class BookService {
@@ -30,7 +32,14 @@ public class BookService {
 	@Autowired
 	private AuthorRepository authorRepository;
 	
+	@Autowired
+	private BookMapper mapper;
+	
+	@Autowired
+	private BookValidator validator;
+	
 	public Book save(Book book) {
+		validator.validate(book);
 		return bookRepository.save(book);
 	}
 	
@@ -79,8 +88,9 @@ public class BookService {
 				.orElseThrow(() -> new IllegalArgumentException("O autor com o ID fornecido não existe no banco."));
 		
 		
-		// vai ser usado quando implementar o validator
-		// Book bookTemp = mapper.toEntity(dto);
+		
+		Book bookTemp = mapper.toEntity(dto);
+		validator.validate(bookTemp);
 		
 		updateData(entity, dto, author);
 		bookRepository.save(entity);
