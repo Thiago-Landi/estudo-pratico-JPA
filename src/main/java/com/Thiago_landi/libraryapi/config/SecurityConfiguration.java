@@ -18,6 +18,9 @@ public class SecurityConfiguration {
 	    return http	            
 	            .csrf(AbstractHttpConfigurer::disable)// Desativa a proteção CSRF, útil para APIs REST
 	            .httpBasic(Customizer.withDefaults())// Habilita a autenticação básica (usuário/senha via pop-up do navegador ou em headers HTTP) 
+	            .formLogin(configurer ->{
+	            	configurer.loginPage("/login").permitAll();
+	            })
 	            .authorizeHttpRequests(authorize -> {// Configura regras de autorização para as requisições HTTP
 	                authorize.anyRequest().authenticated();// Exige autenticação para qualquer requisição na aplicação
 	            })
