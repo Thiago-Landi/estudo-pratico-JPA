@@ -6,11 +6,13 @@ import static com.Thiago_landi.libraryapi.repository.specs.BookSpecs.nameAuthorL
 import static com.Thiago_landi.libraryapi.repository.specs.BookSpecs.titleLike;
 import static com.Thiago_landi.libraryapi.repository.specs.BookSpecs.yearPublicationEqual;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -51,8 +53,10 @@ public class BookService {
 		bookRepository.delete(book);
 	}
 	
-	public List<Book> search(
-			String isbn, String title, String nameAuthor, GenderBook gender, Integer yearPublication){
+	public Page<Book> search(
+			String isbn, String title, String nameAuthor, 
+			GenderBook gender, Integer yearPublication,
+			Integer page, Integer pageSize){
 		
 		Specification<Book> specs = Specification.where((root, query, cb)  -> cb.conjunction());
 		
@@ -77,7 +81,10 @@ public class BookService {
 			specs = specs.and(nameAuthorLike(nameAuthor));
 		}
 		
-		return bookRepository.findAll(specs);
+		// definindo consulta paginada
+		Pageable pageRequest = PageRequest.of(page, pageSize);
+		
+		return bookRepository.findAll(specs, pageRequest);
 	}
 	
 	public void update(UUID id, RegisterBookDTO dto) {

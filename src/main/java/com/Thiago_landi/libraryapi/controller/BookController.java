@@ -1,11 +1,10 @@
 package com.Thiago_landi.libraryapi.controller;
 
 import java.net.URI;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -64,7 +63,7 @@ public class BookController implements GenericController {
 	}
 	
 	@GetMapping
-	public ResponseEntity<List<SearchBookDTO>> search(
+	public ResponseEntity<Page<SearchBookDTO>> search(
 			@RequestParam(value = "isbn", required = false)
 			String isbn, 
 			@RequestParam(value = "title", required = false)
@@ -74,13 +73,19 @@ public class BookController implements GenericController {
 			@RequestParam(value = "gender", required = false)
 			GenderBook gender, 
 			@RequestParam(value = "yearPublication", required = false)
-			Integer yearPublication) {
+			Integer yearPublication,
+			@RequestParam(value = "page", defaultValue = "0")
+			Integer page,
+			@RequestParam(value = "page-size", defaultValue = "10")
+			Integer pageSize
+	){
+
+		Page<Book> pageResult = service.search(
+				isbn, title, nameAuthor, gender, yearPublication, page, pageSize);
 		
-		var result = service.search(isbn, title, nameAuthor, gender, yearPublication);
-		var list = result.stream()
-				.map(mapper::toDTO)
-				.collect(Collectors.toList());
-		return ResponseEntity.ok(list);
+		Page<SearchBookDTO> result = pageResult.map(mapper::toDTO);
+		return ResponseEntity.ok(result);
+
 	}
 	
 	@PutMapping("{id}")
