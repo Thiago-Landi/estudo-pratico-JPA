@@ -13,6 +13,7 @@ import com.Thiago_landi.libraryapi.controller.dto.AuthorDTO;
 import com.Thiago_landi.libraryapi.controller.mappers.AuthorMapper;
 import com.Thiago_landi.libraryapi.exceptions.InvalidOperationException;
 import com.Thiago_landi.libraryapi.model.Author;
+import com.Thiago_landi.libraryapi.model.UserClass;
 import com.Thiago_landi.libraryapi.repository.AuthorRepository;
 import com.Thiago_landi.libraryapi.repository.BookRepository;
 import com.Thiago_landi.libraryapi.validator.AuthorValidator;
@@ -32,8 +33,13 @@ public class AuthorService {
 	@Autowired
 	private AuthorMapper mapper;
 	
+	@Autowired
+	private SecurityService securityService;
+	
 	public Author save(Author author) {
 		validator.validate(author);
+		UserClass user = securityService.getLoggedUser();
+		author.setUser(user);
 		return authorRepository.save(author);
 	}
 	

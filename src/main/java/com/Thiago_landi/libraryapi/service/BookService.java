@@ -21,6 +21,7 @@ import com.Thiago_landi.libraryapi.controller.mappers.BookMapper;
 import com.Thiago_landi.libraryapi.model.Author;
 import com.Thiago_landi.libraryapi.model.Book;
 import com.Thiago_landi.libraryapi.model.GenderBook;
+import com.Thiago_landi.libraryapi.model.UserClass;
 import com.Thiago_landi.libraryapi.repository.AuthorRepository;
 import com.Thiago_landi.libraryapi.repository.BookRepository;
 import com.Thiago_landi.libraryapi.validator.BookValidator;
@@ -40,8 +41,13 @@ public class BookService {
 	@Autowired
 	private BookValidator validator;
 	
+	@Autowired
+	private SecurityService securityService;
+	
 	public Book save(Book book) {
 		validator.validate(book);
+		UserClass user = securityService.getLoggedUser();
+		book.setUser(user);
 		return bookRepository.save(book);
 	}
 	

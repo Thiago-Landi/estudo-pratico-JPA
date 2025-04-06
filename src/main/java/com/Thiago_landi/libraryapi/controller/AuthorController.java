@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,6 +37,7 @@ public class AuthorController implements GenericController {
 	private AuthorMapper mapper;
 	
 	@PostMapping
+	@PreAuthorize("hasRole('GERENTE')")
 	public ResponseEntity<Object> save(@RequestBody @Valid AuthorDTO dto) {
 		
 		Author authorModel = mapper.toEntity(dto);
@@ -49,6 +51,7 @@ public class AuthorController implements GenericController {
 	}
 	
 	@GetMapping("{id}")
+	@PreAuthorize("hasAnyRole('OPERADOR', 'GERENTE')")
 	public ResponseEntity<AuthorDTO> findById(@PathVariable("id") String id) {
 		var idAuthor = UUID.fromString(id);
 		
@@ -62,6 +65,7 @@ public class AuthorController implements GenericController {
 	}
 	
 	@DeleteMapping("{id}")
+	@PreAuthorize("hasRole('GERENTE')")
 	public ResponseEntity<Object> delete(@PathVariable("id") String id) {
 		
 		var idAuthor = UUID.fromString(id);
@@ -79,6 +83,7 @@ public class AuthorController implements GenericController {
 	
 	// esse codigo buscar de acordo ao nome ou a nacionalidade ou os 2
 	@GetMapping
+	@PreAuthorize("hasAnyRole('OPERADOR', 'GERENTE')")
 	public ResponseEntity<List<AuthorDTO>> search(
 			@RequestParam(value = "name", required = false) String name, // o required diz que não é obrigado a passar os paramentros, passando um ou o outro ou os 2 vai funcionar
 			@RequestParam(value = "nationality", required = false) String nationality) {
@@ -92,6 +97,7 @@ public class AuthorController implements GenericController {
 	}
 	
 	@PutMapping("{id}")
+	@PreAuthorize("hasRole('GERENTE')")
 	public ResponseEntity<Object> update(
 			@PathVariable("id") String id, @RequestBody @Valid AuthorDTO dto){
 		var idAuthor = UUID.fromString(id);

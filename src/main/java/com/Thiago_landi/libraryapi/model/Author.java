@@ -15,6 +15,8 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -55,6 +57,7 @@ public class Author {
 	@Column(name = "date_update")
 	private LocalDateTime dateUpdate ;
 	
-	@Column(name = "id_user")
-	private UUID idUser;
+	@ManyToOne 
+	@JoinColumn(name = "id_user")
+	private UserClass user;
 }

@@ -3,20 +3,23 @@ package com.Thiago_landi.libraryapi.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+
+import com.Thiago_landi.libraryapi.security.CustomUserDetailsService;
+import com.Thiago_landi.libraryapi.service.UserService;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfiguration {
 
 	@Bean
@@ -28,10 +31,9 @@ public class SecurityConfiguration {
 	            	configurer.loginPage("/login");
 	            })
 	            .authorizeHttpRequests(authorize -> {// Configura regras de autorização para as requisições HTTP
-	            	authorize.requestMatchers("/login/**").permitAll();
-	            	authorize.requestMatchers("/authors/**").hasRole("ADMIN");
-	            	authorize.requestMatchers("/books/**").hasAnyRole("USER", "ADMIN");
-	    
+	            	authorize.requestMatchers("/login/**").permitAll();	 
+	            	authorize.requestMatchers(HttpMethod.POST, "/users/**").permitAll();
+	            	
 	            	authorize.anyRequest().authenticated();// Exige autenticação para qualquer requisição na aplicação
 	            })
 	            .build();// Constrói e retorna a configuração de segurança
@@ -43,19 +45,7 @@ public class SecurityConfiguration {
 	}
 	
 	@Bean
-	public UserDetailsService userDetailsService(PasswordEncoder enconder) {
-		UserDetails user1 = User.builder()
-				.username("usuario")
-				.password(enconder.encode("123"))
-				.roles("USER")
-				.build();
-		
-		UserDetails user2 = User.builder()
-				.username("admin")
-				.password(enconder.encode("321"))
-				.roles("ADMIN")
-				.build();
-		
-		return new InMemoryUserDetailsManager(user1, user2);
+	public UserDetailsService userDetailsService(UserService userService) {	
+		return new CustomUserDetailsService(userService);
 	}
 }
