@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,25 +28,37 @@ public class SecurityConfiguration {
 	    return http	            
 	            .csrf(AbstractHttpConfigurer::disable)// Desativa a proteção CSRF, útil para APIs REST
 	            .httpBasic(Customizer.withDefaults())// Habilita a autenticação básica (usuário/senha via pop-up do navegador ou em headers HTTP) 
-	            .formLogin(configurer ->{
+	           /* .formLogin(configurer ->{
 	            	configurer.loginPage("/login");
-	            })
+	            })*/
+	            .formLogin(Customizer.withDefaults())
 	            .authorizeHttpRequests(authorize -> {// Configura regras de autorização para as requisições HTTP
 	            	authorize.requestMatchers("/login/**").permitAll();	 
 	            	authorize.requestMatchers(HttpMethod.POST, "/users/**").permitAll();
 	            	
 	            	authorize.anyRequest().authenticated();// Exige autenticação para qualquer requisição na aplicação
 	            })
+	            .oauth2Login(Customizer.withDefaults())
 	            .build();// Constrói e retorna a configuração de segurança
 	}
+	
 	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder(10);
 	}
 	
+	//com uma authentication personalizada, não precisa mais dele
+	/*
 	@Bean
 	public UserDetailsService userDetailsService(UserService userService) {	
 		return new CustomUserDetailsService(userService);
+	}*/
+	
+	// Por padrão, o Spring Security adiciona o prefixo "ROLE_" às authorities. Ao passar uma string vazia (""), você está removendo esse prefixo.
+	@Bean
+	public GrantedAuthorityDefaults grantedAuthorityDefaults() {
+		return new GrantedAuthorityDefaults("");
 	}
+	
 }
