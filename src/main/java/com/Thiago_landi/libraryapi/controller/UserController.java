@@ -1,5 +1,7 @@
 package com.Thiago_landi.libraryapi.controller;
 
+import java.net.URI;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +15,11 @@ import com.Thiago_landi.libraryapi.controller.dto.UserDTO;
 import com.Thiago_landi.libraryapi.controller.mappers.UserMapper;
 import com.Thiago_landi.libraryapi.service.UserService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("users")
-public class UserController {
+public class UserController implements GenericController {
 	
 	@Autowired
 	private UserService service;
@@ -25,9 +29,13 @@ public class UserController {
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public ResponseEntity<Void> save(@RequestBody UserDTO dto){
+	public ResponseEntity<Void> save(@RequestBody @Valid UserDTO dto){
 		var user = mapper.toEntity(dto);
 		service.save(user);
-		return ResponseEntity.ok().build();
+		
+		// esse codigo constroi a url para acessar o author criado (URL:http://localhost:8080/authors/{id}
+		URI location = generateHeaderlocation(user.getId());
+			
+		return ResponseEntity.created(location).build();
 	}
 }

@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.Thiago_landi.libraryapi.security.CustomUserDetailsService;
+import com.Thiago_landi.libraryapi.security.LoginSocialSuccessHandler;
 import com.Thiago_landi.libraryapi.service.UserService;
 
 @Configuration
@@ -24,21 +25,24 @@ import com.Thiago_landi.libraryapi.service.UserService;
 public class SecurityConfiguration {
 
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	public SecurityFilterChain securityFilterChain(HttpSecurity http, LoginSocialSuccessHandler successHandler) throws Exception {
 	    return http	            
 	            .csrf(AbstractHttpConfigurer::disable)// Desativa a proteção CSRF, útil para APIs REST
 	            .httpBasic(Customizer.withDefaults())// Habilita a autenticação básica (usuário/senha via pop-up do navegador ou em headers HTTP) 
-	           /* .formLogin(configurer ->{
+	            .formLogin(configurer ->{
 	            	configurer.loginPage("/login");
-	            })*/
-	            .formLogin(Customizer.withDefaults())
+	            })
 	            .authorizeHttpRequests(authorize -> {// Configura regras de autorização para as requisições HTTP
 	            	authorize.requestMatchers("/login/**").permitAll();	 
 	            	authorize.requestMatchers(HttpMethod.POST, "/users/**").permitAll();
 	            	
 	            	authorize.anyRequest().authenticated();// Exige autenticação para qualquer requisição na aplicação
 	            })
-	            .oauth2Login(Customizer.withDefaults())
+	            .oauth2Login(oauth2 -> {// vai se autenticar via google/oauth2 e vai para uma authentication personalizada
+	            	oauth2
+	            		.loginPage("/login")
+	            		.successHandler(successHandler);
+	            })
 	            .build();// Constrói e retorna a configuração de segurança
 	}
 	
