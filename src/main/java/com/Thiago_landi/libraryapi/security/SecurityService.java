@@ -14,7 +14,8 @@ public class SecurityService {
 	@Autowired
 	private UserService userService;
 	
-	//Retorna o usuário atualmente logado. Se o usuário estiver autenticado por meio do CustomAuthentication, o método retorna o objeto Usuario associado. Caso contrário, retorna null.
+	//Retorna o usuário atualmente logado. Se o usuário estiver autenticado por meio do 
+	//CustomAuthentication, o método retorna o objeto Usuario associado. Caso contrário, retorna null.
 	public UserClass getLoggedUser() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

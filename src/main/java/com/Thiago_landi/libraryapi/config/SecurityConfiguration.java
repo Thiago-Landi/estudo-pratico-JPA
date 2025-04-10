@@ -28,9 +28,9 @@ public class SecurityConfiguration {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http, LoginSocialSuccessHandler successHandler) throws Exception {
 	    return http	            
 	            .csrf(AbstractHttpConfigurer::disable)// Desativa a proteção CSRF, útil para APIs REST
-	            .httpBasic(Customizer.withDefaults())// Habilita a autenticação básica (usuário/senha via pop-up do navegador ou em headers HTTP) 
+	            .httpBasic(Customizer.withDefaults())//Ativa o login básico do navegador (usuário/senha via pop-up do navegador ou em headers HTTP) 
 	            .formLogin(configurer ->{
-	            	configurer.loginPage("/login");
+	            	configurer.loginPage("/login");//Habilita o formulário de login (aquele que você cria com um HTML)
 	            })
 	            .authorizeHttpRequests(authorize -> {// Configura regras de autorização para as requisições HTTP
 	            	authorize.requestMatchers("/login/**").permitAll();	 

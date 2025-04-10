@@ -12,6 +12,9 @@ import com.Thiago_landi.libraryapi.model.UserClass;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+//Quando alguém faz login (por formulário, Google, etc.), o Spring cria um objeto de 
+//autenticação (Authentication) com os dados do usuário. e eu criei a minha propria authentication 
+//com a minha própria classe de usuário (UserClass), com os dados que vêm do banco de dados
 @RequiredArgsConstructor
 @Getter
 public class CustomAuthentication implements Authentication {
@@ -21,8 +24,10 @@ public class CustomAuthentication implements Authentication {
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return this.user
-				.getRoles().stream()
+		//pega as roles do UserClass e transforma em objetos que o Spring entende (SimpleGrantedAuthority).
+		//(SimpleGrantedAuthority). para decidir se o usuário pode ou não acessar alguma coisa
+		return this.user.getRoles()
+				.stream()
 				.map(SimpleGrantedAuthority::new)
 				.collect(Collectors.toList());
 	}
@@ -56,10 +61,4 @@ public class CustomAuthentication implements Authentication {
 		public String getName() {
 			return user.getLogin();
 		}
-
-	public UserClass getUser() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

@@ -10,9 +10,10 @@ import com.Thiago_landi.libraryapi.security.CustomAuthentication;
 @Controller // é pra paginas web
 public class LoginViewController {
 
+	// retorna o login.html para mostrar a pagina de login
 	@GetMapping("/login")
 	public String pageLogin() {
-		return "login";
+		return "login"; // arquivo html
 	}
 	
 	@GetMapping("/")

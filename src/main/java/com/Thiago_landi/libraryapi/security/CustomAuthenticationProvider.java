@@ -21,7 +21,8 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 	@Autowired
 	private PasswordEncoder encoder;
 	
-	// esse codigo faz a autenticação(authentication) do login feito pelo usuario, esse é o authentication personalizado
+	// esse codigo faz a autenticação(authentication) do login feito pelo usuario, esse é o 
+	//authentication personalizado
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		String login = authentication.getName();//em authentication, geteName é Login

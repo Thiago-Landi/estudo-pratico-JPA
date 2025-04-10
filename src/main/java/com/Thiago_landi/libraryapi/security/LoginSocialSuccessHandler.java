@@ -27,9 +27,8 @@ public class LoginSocialSuccessHandler extends SavedRequestAwareAuthenticationSu
     private static final String PASSWORD_DEFAULT = "321";// apenas para fins de estudo
 	private final UserService userService;
 	
-	//É chamado automaticamente quando o login dá certo
-	//Serve pra você controlar o que acontece depois do login
-	//pode personalizar a experiência do usuário
+	// faz a ponte entre o login do Google e o seu sistema real, garantindo que o usuário 
+	//esteja cadastrado e reconhecido no backend.
 	@Override
 		public void onAuthenticationSuccess(
 				HttpServletRequest request, 
