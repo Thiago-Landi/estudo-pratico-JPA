@@ -3,6 +3,7 @@ package com.Thiago_landi.libraryapi.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -10,21 +11,20 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.Thiago_landi.libraryapi.security.CustomUserDetailsService;
 import com.Thiago_landi.libraryapi.security.LoginSocialSuccessHandler;
-import com.Thiago_landi.libraryapi.service.UserService;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfiguration {
 
+	
 	@Bean
+	@Order(2)
 	public SecurityFilterChain securityFilterChain(HttpSecurity http, LoginSocialSuccessHandler successHandler) throws Exception {
 	    return http	            
 	            .csrf(AbstractHttpConfigurer::disable)// Desativa a proteção CSRF, útil para APIs REST
@@ -43,21 +43,10 @@ public class SecurityConfiguration {
 	            		.loginPage("/login")
 	            		.successHandler(successHandler);
 	            })
+	            //essa linha habilita o usuario por meio do jwt
+	            .oauth2ResourceServer(oauth2RS -> oauth2RS.jwt(Customizer.withDefaults()))
 	            .build();// Constrói e retorna a configuração de segurança
 	}
-	
-	
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder(10);
-	}
-	
-	//com uma authentication personalizada, não precisa mais dele
-	/*
-	@Bean
-	public UserDetailsService userDetailsService(UserService userService) {	
-		return new CustomUserDetailsService(userService);
-	}*/
 	
 	// Por padrão, o Spring Security adiciona o prefixo "ROLE_" às authorities. Ao passar uma string vazia (""), você está removendo esse prefixo.
 	@Bean
@@ -65,4 +54,18 @@ public class SecurityConfiguration {
 		return new GrantedAuthorityDefaults("");
 	}
 	
+	
+	// faz com que o Spring saiba interpretar o token JWT recebido, e entenda corretamente 
+	//quais permissões (roles ou scopes) o usuário tem.
+	@Bean
+	public JwtAuthenticationConverter jwtAuthenticationConverter() {
+		var authoritiesConverter = new JwtGrantedAuthoritiesConverter();
+		authoritiesConverter.setAuthorityPrefix(""); //retira o prefixo padrão
+		
+		var converter = new JwtAuthenticationConverter();
+		converter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
+		return converter;
+	}
+	
+
 }
