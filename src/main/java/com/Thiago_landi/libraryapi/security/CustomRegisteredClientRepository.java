@@ -61,7 +61,7 @@ public class CustomRegisteredClientRepository implements RegisteredClientReposit
 				// O cliente (ex: microserviço) envia o client_id e o client_secret. O servidor autentica o cliente.
 				//Retorna um token de acesso. Esse token é usado pra acessar a API.(sem interaçãocom usuario)
 				.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)// é usado quando já tem o token e precisa renovar ele
 				.tokenSettings(tokenSettings) // passando o token personalizado
 				.clientSettings(clientSettings) // passando Como o cliente vai se autenticar e interagir com o usuário
 				.build();
